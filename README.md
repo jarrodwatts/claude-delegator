@@ -28,20 +28,23 @@ Inside a Claude Code instance, run the following commands:
 
 Done! Claude now routes complex tasks to GPT experts automatically.
 
-> **Note**: Requires [Codex CLI](https://github.com/openai/codex). Setup guides you through installation.
+> **Note**: Requires [Codex CLI](https://github.com/openai/codex) or [Gemini CLI](https://github.com/google/gemini-cli). Setup guides you through installation.
 
 ---
 
 ## What is Claude Delegator?
 
-Claude gains a team of GPT specialists via native MCP. Each expert has a distinct specialty and can advise OR implement.
+Claude gains a team of GPT and Gemini specialists via native MCP. Each expert has a distinct specialty and can advise OR implement.
+
+**Note:** You can use either provider (GPT or Gemini), or both. The plugin will automatically detect which one is configured and route tasks accordingly.
 
 | What You Get | Why It Matters |
 |--------------|----------------|
 | **5 domain experts** | Right specialist for each problem type |
+| **GPT or Gemini** | Use your preferred model provider |
 | **Dual mode** | Experts can analyze (read-only) or implement (write) |
 | **Auto-routing** | Claude detects when to delegate based on your request |
-| **Synthesized responses** | Claude interprets GPT output, never raw passthrough |
+| **Synthesized responses** | Claude interprets expert output, never raw passthrough |
 
 ### The Experts
 
@@ -76,11 +79,12 @@ You: "Is this authentication flow secure?"
                     ↓
 Claude: [Detects security question → selects Security Analyst]
                     ↓
-        ┌─────────────────────────────┐
-        │  mcp__codex__codex          │
-        │  → Security Analyst prompt  │
-        │  → GPT analyzes your code   │
-        └─────────────────────────────┘
+        ┌───────────────────────────────┐
+        │  mcp__codex__codex            │
+        │  (or mcp__gemini__gemini)     │
+        │  → Security Analyst prompt    │
+        │  → Expert analyzes your code  │
+        └───────────────────────────────┘
                     ↓
 Claude: "Based on the analysis, I found 3 issues..."
         [Synthesizes response, applies judgment]
@@ -88,7 +92,7 @@ Claude: "Based on the analysis, I found 3 issues..."
 
 **Key details:**
 - Each expert has a specialized system prompt (in `prompts/`)
-- Claude reads your request → picks the right expert → delegates via MCP
+- Claude reads your request → picks the right expert → delegates via MCP (GPT or Gemini)
 - Responses are synthesized, not passed through raw
 - Experts can retry up to 3 times before escalating
 - Multi-turn conversations preserve context via `threadId` for chained tasks
@@ -98,12 +102,12 @@ Claude: "Based on the analysis, I found 3 issues..."
 For chained implementation steps, the expert preserves context across turns:
 
 ```
-Turn 1: mcp__codex__codex → returns threadId
-Turn 2: mcp__codex__codex-reply(threadId) → expert remembers turn 1
-Turn 3: mcp__codex__codex-reply(threadId) → expert remembers turns 1-2
+Turn 1: mcp__*__* → returns threadId
+Turn 2: mcp__*__*-reply(threadId) → expert remembers turn 1
+Turn 3: mcp__*__*-reply(threadId) → expert remembers turns 1-2
 ```
 
-Use single-shot (`codex` only) for advisory tasks. Use multi-turn for implementation chains and retries.
+Use single-shot (`codex` or `gemini` only) for advisory tasks. Use multi-turn for implementation chains and retries.
 
 ---
 
@@ -133,10 +137,14 @@ Per-call parameters override these defaults. See [Codex CLI docs](https://github
 
 ### Manual MCP Setup
 
-If `/setup` doesn't work, register the MCP server manually:
+If `/setup` doesn't work, register the MCP server(s) manually:
 
 ```bash
+# For Codex (GPT)
 claude mcp add --transport stdio --scope user codex -- codex -m gpt-5.3-codex mcp-server
+
+# For Gemini
+claude mcp add --transport stdio --scope user gemini -- node ${CLAUDE_PLUGIN_ROOT}/server/gemini/index.js
 ```
 
 Verify with:
@@ -159,8 +167,12 @@ Edit these to customize expert behavior for your workflow.
 
 ## Requirements
 
-- **Codex CLI**: `npm install -g @openai/codex`
-- **Authentication**: Run `codex login` after installation
+You need at least one of the following providers configured:
+
+- **Codex CLI** (for GPT): `npm install -g @openai/codex`
+- **Gemini CLI** (for Gemini): `npm install -g @google/gemini-cli`
+
+**Authentication**: Run `codex login` or `gemini login` after installation.
 
 ---
 
@@ -178,9 +190,9 @@ Edit these to customize expert behavior for your workflow.
 | Issue | Solution |
 |-------|----------|
 | MCP server not found | Restart Claude Code after setup |
-| Codex not authenticated | Run `codex login` |
-| Tool not appearing | Run `claude mcp list` and verify codex is registered |
-| Expert not triggered | Try explicit: "Ask GPT to review this architecture" |
+| Provider not authenticated | Run `codex login` or `gemini login` |
+| Tool not appearing | Run `claude mcp list` and verify registration |
+| Expert not triggered | Try explicit: "Ask GPT to review..." or "Ask Gemini to review..." |
 
 ---
 

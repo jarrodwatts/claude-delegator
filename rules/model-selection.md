@@ -1,6 +1,17 @@
 # Model Selection Guidelines
 
-GPT experts serve as specialized consultants for complex problems. Each expert has a distinct specialty but can operate in advisory or implementation mode.
+GPT (Codex) and Gemini experts serve as specialized consultants for complex problems.
+
+## Provider Selection
+
+Before delegating, check which MCP tools are available in the current environment:
+
+1. **If both are available**: 
+   - Use **Gemini** for tasks requiring large context or multimodal analysis.
+   - Use **GPT (Codex)** for tasks where the user explicitly asked for "GPT" or "Codex".
+   - Default to **Gemini** for general reasoning.
+2. **If only one is available**: Use the available provider regardless of the task type.
+3. **If neither is available**: Do not delegate; inform the user that they need to run `/claude-delegator:setup`.
 
 ## Expert Directory
 
@@ -126,7 +137,26 @@ Every expert can operate in two modes:
 | `threadId` | string | **Required.** Thread ID from previous `codex` call |
 | `prompt` | string | **Required.** Follow-up instruction |
 
-### Response Format (both tools)
+## Gemini Parameters Reference
+
+### `mcp__gemini__gemini` (Start Session)
+
+| Parameter | Values | Notes |
+|-----------|--------|-------|
+| `prompt` | string | **Required.** The delegation prompt (use 7-section format) |
+| `developer-instructions` | string | Expert prompt injection (from `prompts/*.md`) |
+| `sandbox` | `read-only`, `workspace-write`, `danger-full-access` | Controls file access. |
+| `model` | e.g. `gemini-2.5-pro` | Override the default model |
+| `cwd` | path | Working directory for the task |
+
+### `mcp__gemini__gemini-reply` (Continue Session)
+
+| Parameter | Values | Notes |
+|-----------|--------|-------|
+| `threadId` | string | **Required.** Thread ID from previous `gemini` call |
+| `prompt` | string | **Required.** Follow-up instruction |
+
+### Response Format (both providers)
 
 | Field | Type | Description |
 |-------|------|-------------|

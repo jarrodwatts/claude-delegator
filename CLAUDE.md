@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A Claude Code plugin that provides GPT (via Codex CLI) as specialized expert subagents. Five domain experts that can advise OR implement: Architect, Plan Reviewer, Scope Analyst, Code Reviewer, and Security Analyst.
+A Claude Code plugin that provides GPT (via Codex CLI) and Gemini (via Gemini CLI) as specialized expert subagents. Five domain experts that can advise OR implement: Architect, Plan Reviewer, Scope Analyst, Code Reviewer, and Security Analyst.
 
 ## Development Commands
 
@@ -19,16 +19,16 @@ claude --plugin-dir /path/to/claude-delegator
 /claude-delegator:uninstall
 ```
 
-No build step, no dependencies. Uses Codex CLI's native MCP server.
+No build step, no dependencies. Uses native MCP servers from Codex and Gemini CLIs.
 
 ## Architecture
 
 ### Orchestration Flow
 
-Claude acts as orchestrator—delegates to specialized GPT experts based on task type. Supports both **single-shot** (independent calls) and **multi-turn** (context preserved via `threadId` with `codex-reply`).
+Claude acts as orchestrator—delegates to specialized experts based on task type. Supports both **single-shot** (independent calls) and **multi-turn** (context preserved via `threadId`).
 
 ```
-User Request → Claude Code → [Match trigger → Select expert]
+User Request → Claude Code → [Match trigger → Select expert & provider]
                                     ↓
               ┌─────────────────────┼─────────────────────┐
               ↓                     ↓                     ↓
@@ -44,7 +44,7 @@ User Request → Claude Code → [Match trigger → Select expert]
 1. **Match trigger** - Check `rules/triggers.md` for semantic patterns
 2. **Read expert prompt** - Load from `prompts/[expert].md`
 3. **Build 7-section prompt** - Use format from `rules/delegation-format.md`
-4. **Call `mcp__codex__codex`** - Pass expert prompt via `developer-instructions`
+4. **Call provider tool** - `mcp__codex__codex` or `mcp__gemini__gemini`
 5. **Synthesize response** - Never show raw output; interpret and verify
 
 ### The 7-Section Delegation Format
@@ -53,10 +53,10 @@ Every delegation prompt must include: TASK, EXPECTED OUTCOME, CONTEXT, CONSTRAIN
 
 ### Retry Handling
 
-Retries use multi-turn (`codex-reply` with `threadId`) so the expert remembers previous attempts:
-- Attempt 1 fails → `codex-reply` with error details (context preserved)
+Retries use multi-turn (`*-reply` with `threadId`) so the expert remembers previous attempts:
+- Attempt 1 fails → retry with error details (context preserved)
 - Up to 3 attempts → then escalate to user
-- Fallback: new `codex` call with full history if multi-turn unavailable
+- Fallback: new call with full history if multi-turn unavailable
 
 ### Component Relationships
 
@@ -83,10 +83,10 @@ Every expert can operate in **advisory** (`sandbox: read-only`) or **implementat
 
 ## Key Design Decisions
 
-1. **Native MCP only** - Codex has `codex mcp-server`, no wrapper needed
-2. **Single-shot + multi-turn** - Single-shot for advisory (full context per call), multi-turn via `threadId`/`codex-reply` for chained implementation and retries
+1. **Native & Bridge MCP** - Codex has a native `mcp-server` command. Gemini requires an internal bridge (`server/gemini/index.js`) to expose its CLI via MCP.
+2. **Single-shot + multi-turn** - Single-shot for advisory (full context per call), multi-turn via `threadId` for chained implementation and retries
 3. **Dual mode** - Any expert can advise or implement based on task
-4. **Synthesize, don't passthrough** - Claude interprets GPT output, applies judgment
+4. **Synthesize, don't passthrough** - Claude interprets expert output, applies judgment
 5. **Proactive triggers** - Claude checks for delegation triggers on every message
 
 ## When NOT to Delegate

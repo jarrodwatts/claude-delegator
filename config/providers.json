@@ -14,6 +14,21 @@
       "experts": ["architect", "plan-reviewer", "scope-analyst", "code-reviewer", "security-analyst"],
       "strengths": ["architecture", "code-review", "security", "requirements-analysis", "plan-validation"],
       "avoid": ["simple-operations", "trivial-decisions", "research", "first-attempt-fixes"]
+    },
+    "gemini": {
+      "name": "Gemini",
+      "description": "Google Gemini models via Gemini CLI - specialized expert subagents",
+      "cli": "gemini",
+      "install": "npm install -g @google/gemini-cli",
+      "auth": "gemini login",
+      "mcp": {
+        "type": "stdio",
+        "command": "node",
+        "args": ["${CLAUDE_PLUGIN_ROOT}/server/gemini/index.js"]
+      },
+      "experts": ["architect", "plan-reviewer", "scope-analyst", "code-reviewer", "security-analyst"],
+      "strengths": ["reasoning", "large context", "code generation", "multimodal analysis"],
+      "avoid": ["simple-operations", "trivial-decisions", "research", "first-attempt-fixes"]
     }
   }
 }

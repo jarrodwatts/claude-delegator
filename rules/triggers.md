@@ -8,7 +8,7 @@ You MUST scan incoming messages for delegation triggers. This is NOT optional.
 
 **Behavior:**
 1. **PROACTIVE**: On every user message, check if semantic triggers match → delegate automatically
-2. **REACTIVE**: If user explicitly mentions GPT/Codex → delegate immediately
+2. **REACTIVE**: If user explicitly mentions GPT/Codex or Gemini → delegate immediately
 
 When a trigger matches:
 1. Identify the appropriate expert
@@ -34,6 +34,7 @@ User explicitly requests delegation:
 | Phrase Pattern | Expert |
 |----------------|--------|
 | "ask GPT", "consult GPT" | Route based on context |
+| "ask Gemini", "ask gemini" | Route based on context |
 | "review this architecture" | Architect |
 | "review this plan" | Plan Reviewer |
 | "analyze the scope" | Scope Analyst |
@@ -121,25 +122,25 @@ Set the sandbox based on what the task requires, not the expert type.
 **Examples:**
 
 ```typescript
-// Architect analyzing (advisory)
+// Architect analyzing (advisory via Codex)
 mcp__codex__codex({
   prompt: "Analyze tradeoffs of Redis vs in-memory caching",
   sandbox: "read-only"
 })
 
-// Architect implementing (implementation)
-mcp__codex__codex({
+// Architect implementing (implementation via Gemini)
+mcp__gemini__gemini({
   prompt: "Refactor the caching layer to use Redis",
   sandbox: "workspace-write"
 })
 
-// Security Analyst reviewing (advisory)
-mcp__codex__codex({
+// Security Analyst reviewing (advisory via Gemini)
+mcp__gemini__gemini({
   prompt: "Review this auth flow for vulnerabilities",
   sandbox: "read-only"
 })
 
-// Security Analyst hardening (implementation)
+// Security Analyst hardening (implementation via Codex)
 mcp__codex__codex({
   prompt: "Fix the SQL injection vulnerability in user.ts",
   sandbox: "workspace-write"
