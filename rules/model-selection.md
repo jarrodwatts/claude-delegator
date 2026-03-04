@@ -145,7 +145,7 @@ Every expert can operate in two modes:
 |-----------|--------|-------|
 | `prompt` | string | **Required.** The delegation prompt (use 7-section format) |
 | `developer-instructions` | string | Expert prompt injection (from `prompts/*.md`) |
-| `sandbox` | `read-only`, `workspace-write`, `danger-full-access` | Controls file access. |
+| `sandbox` | `read-only`, `workspace-write` | Controls file access. |
 | `model` | e.g. `gemini-2.5-pro` | Override the default model |
 | `cwd` | path | Working directory for the task |
 
