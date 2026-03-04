@@ -61,17 +61,20 @@ Replace the entire Step 3 section with:
 Register Codex as an MCP server using Claude Code's native command:
 
 ```bash
+# Re-run safe: replace existing user-scoped entry if present.
+claude mcp remove --scope user codex >/dev/null 2>&1 || true
 claude mcp add --transport stdio --scope user codex -- codex -m gpt-5.3-codex mcp-server
 ```
 
-This registers the Codex MCP server at user scope (available across all projects).
+This registers the Codex MCP server at user scope (available across all projects) and avoids "already exists" failures on rerun.
 
 **Note:** To customise Codex behaviour, add CLI flags before `mcp-server`:
-- `-p nosandbox` — disable sandbox restrictions
+- `-s workspace-write` — allow workspace writes with sandboxing
+- `-s danger-full-access` — disable sandbox restrictions (trusted/external sandbox only)
 - `-c 'model_reasoning_effort="xhigh"'` — set reasoning effort
 - Example with all options:
   ```bash
-  claude mcp add --transport stdio --scope user codex -- codex -p nosandbox -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' mcp-server
+  claude mcp add --transport stdio --scope user codex -- codex -s workspace-write -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' mcp-server
   ```
 ```
 
@@ -80,8 +83,15 @@ This registers the Codex MCP server at user scope (available across all projects
 Replace the MCP config check (Check 2) with:
 
 ```bash
-# Check 2: MCP server registered
-claude mcp list 2>/dev/null | grep -q "codex" && echo "OK" || echo "NOT CONFIGURED"
+# Check 2: MCP server health
+CODEX_CONFIG=$(claude mcp get codex 2>/dev/null || true)
+if echo "$CODEX_CONFIG" | grep -q "Status: ✓ Connected"; then
+  echo "OK"
+elif echo "$CODEX_CONFIG" | grep -q "^codex:"; then
+  echo "NOT HEALTHY"
+else
+  echo "NOT CONFIGURED"
+fi
 ```
 
 **Step 3: Update Step 6 status report (lines 84-97)**
