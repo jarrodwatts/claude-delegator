@@ -7,8 +7,8 @@
     },
     "gemini": {
       "type": "stdio",
-      "command": "gemini",
-      "args": ["-m", "gemini-2.5-flash", "mcp-server"]
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/server/gemini/index.js"]
     }
   }
 }
