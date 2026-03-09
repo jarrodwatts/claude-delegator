@@ -113,6 +113,18 @@ Every expert can operate in two modes:
 - Advisory: Threat summary, vulnerabilities, risk rating
 - Implementation: Vulnerabilities fixed, files modified, verification
 
+## Expert Model Assignments (Codex/GPT)
+
+Always pass the `model` parameter when calling `mcp__codex__codex` to match the expert to the right model:
+
+| Expert | Model | Reason |
+|--------|-------|--------|
+| Architect | `gpt-5.4` | Long-term impact decisions, called rarely |
+| Plan Reviewer | `gpt-5.4` | Deep gap detection before costly work begins |
+| Scope Analyst | `gpt-5.4` | Nuanced requirements reasoning |
+| Security Analyst | `gpt-5.4` | Adversarial thinking, misses are costly |
+| Code Reviewer | `gpt-5.3-codex` | Code-specialized model, called frequently |
+
 ## Codex Parameters Reference
 
 ### `mcp__codex__codex` (Start Session)
