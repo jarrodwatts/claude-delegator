@@ -134,10 +134,14 @@ Use the 7-section format from `rules/delegation-format.md`.
 ### Step 6: Call the Expert
 ```typescript
 // Using Codex (GPT)
+// IMPORTANT: Always pass `model` per the expert model assignments in model-selection.md
+// gpt-5.4 for Architect, Plan Reviewer, Scope Analyst, Security Analyst
+// gpt-5.3-codex for Code Reviewer
 mcp__codex__codex({
   prompt: "[your 7-section delegation prompt with FULL context]",
   "developer-instructions": "[contents of the expert's prompt file]",
   sandbox: "[read-only or workspace-write based on mode]",
+  model: "[model per expert — see model-selection.md]",
   cwd: "[current working directory]"
 })
 
