@@ -1,5 +1,18 @@
 # Claude Delegator
 
+> [!WARNING]
+> **This project is archived and no longer maintained.** Codex CLI removed the `codex mcp-server` command this plugin relies on (deprecated in 0.149.1, gone after 0.153), so delegating to Codex no longer works with current Codex. The Gemini bridge is untested against current Gemini CLI releases.
+>
+> To use Codex from Claude Code, install OpenAI's official plugin, [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc):
+>
+> ```
+> /plugin marketplace add openai/codex-plugin-cc
+> /plugin install codex@openai-codex
+> /codex:setup
+> ```
+>
+> Thanks to everyone who used and contributed to Claude Delegator.
+
 GPT expert subagents for Claude Code. Five specialists that can analyze AND implement—architecture, security, code review, and more.
 
 [![License](https://img.shields.io/github/license/jarrodwatts/claude-delegator?v=2)](LICENSE)

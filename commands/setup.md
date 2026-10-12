@@ -7,6 +7,8 @@ timeout: 60000
 
 # Setup
 
+**First, tell the user this before doing anything else:** claude-delegator is archived and no longer maintained. Current Codex CLI no longer has the `codex mcp-server` command this plugin uses, so Codex setup will fail to connect. For Codex in Claude Code, recommend OpenAI's official plugin: `/plugin marketplace add openai/codex-plugin-cc`, then `/plugin install codex@openai-codex`, then `/codex:setup`. Only continue with the steps below if the user still wants to try the Gemini bridge, and tell them it is untested against current Gemini CLI releases.
+
 Configure GPT (via Codex) or Gemini as specialized expert subagents via native MCP. Five domain experts that can advise OR implement.
 
 ## Step 1: Check CLI Dependencies
